@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Destinations{% endblock %}
+
+{% block content %}
+<h2>Destinations</h2>
+<a href="/add_destination" class="btn btn-primary mb-3">Add Destination</a>
+<div class="row">
+    {% for destination in destinations %}
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            {% if destination.image_url %}
+            <img src="{{ destination.image_url }}" class="card-img-top" alt="{{ destination.name }}">
+            {% endif %}
+            <div class="card-body">
+                <h5 class="card-title">{{ destination.name }}</h5>
+                <p class="card-text">{{ destination.description[:100] }}...</p>
+                <a href="/destination/{{ destination.id }}" class="btn btn-primary">View Details</a>
+                <a href="/edit_destination/{{ destination.id }}" class="btn btn-secondary">Edit</a>
+                <form action="/delete_destination/{{ destination.id }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

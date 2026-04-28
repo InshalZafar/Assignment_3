@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Tourism Explorer{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center py-5 mb-5" style="background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80'); background-size: cover; background-position: center; border-radius: 15px; color: white;">
+    <div class="container fade-in-up">
+        <h1 class="display-4 font-weight-bold mb-3">Discover Your Next Adventure</h1>
+        <p class="lead mb-4">Explore amazing destinations, plan unforgettable trips, and share your experiences with fellow travelers.</p>
+        <a class="btn btn-light btn-lg mr-3" href="/destinations" role="button">Explore Destinations</a>
+        <a class="btn btn-outline-light btn-lg" href="/register" role="button">Join Now</a>
+    </div>
+</div>
+
+<div class="features-section py-5">
+    <div class="container">
+        <h2 class="text-center mb-5 fade-in-up">Why Choose Tourism Explorer?</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4 fade-in-up">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">🌍 Explore Destinations</h5>
+                        <p class="card-text">Discover breathtaking places around the world with detailed information and stunning photos.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4 fade-in-up">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">📝 Share Reviews</h5>
+                        <p class="card-text">Read authentic reviews from travelers and share your own experiences to help others.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4 fade-in-up">
+                <div class="card h-100 text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">🗺️ Plan Trips</h5>
+                        <p class="card-text">Create personalized travel plans by adding your favorite destinations and organizing your itinerary.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if destinations %}
+<div class="featured-destinations py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5 fade-in-up">Featured Destinations</h2>
+        <div class="row">
+            {% for destination in destinations[:3] %}
+            <div class="col-md-4 mb-4 fade-in-up">
+                <div class="card h-100">
+                    {% if destination.image_url %}
+                    <img src="{{ destination.image_url }}" class="card-img-top" alt="{{ destination.name }}" style="height: 200px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ destination.name }}</h5>
+                        <p class="card-text">{{ destination.description[:100] }}...</p>
+                        <a href="/destination/{{ destination.id }}" class="btn btn-primary">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="/destinations" class="btn btn-outline-primary btn-lg">View All Destinations</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.hero-section {
+    animation: heroFadeIn 1s ease-out;
+}
+
+@keyframes heroFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.fade-in-up:nth-child(1) { animation-delay: 0.1s; }
+.fade-in-up:nth-child(2) { animation-delay: 0.2s; }
+.fade-in-up:nth-child(3) { animation-delay: 0.3s; }
+.fade-in-up:nth-child(4) { animation-delay: 0.4s; }
+.fade-in-up:nth-child(5) { animation-delay: 0.5s; }
+</style>
+{% endblock %}

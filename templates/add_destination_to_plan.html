@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Add Destination to Plan{% endblock %}
+
+{% block content %}
+<h2>Add Destination to {{ plan.name }}</h2>
+<form method="POST">
+    <div class="mb-3">
+        <label for="destination_id" class="form-label">Select Destination</label>
+        <select name="destination_id" class="form-control" id="destination_id">
+            {% for dest in destinations %}
+            <option value="{{ dest.id }}">{{ dest.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Add</button>
+</form>
+{% endblock %}

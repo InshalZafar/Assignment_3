@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}My Travel Plans{% endblock %}
+
+{% block content %}
+<h2>My Travel Plans</h2>
+<a href="/create_plan" class="btn btn-primary mb-3">Create New Plan</a>
+{% for plan in plans %}
+<div class="card mb-3">
+    <div class="card-header">
+        <h5>{{ plan.name }}</h5>
+    </div>
+    <div class="card-body">
+        <h6>Destinations:</h6>
+        <ul>
+            {% for dest in plan.destinations %}
+            <li>{{ dest.name }} - <a href="/remove_from_plan/{{ plan.id }}/{{ dest.id }}" class="btn btn-sm btn-danger">Remove</a></li>
+            {% endfor %}
+        </ul>
+        <a href="/add_destination_to_plan/{{ plan.id }}" class="btn btn-secondary">Add Destination</a>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

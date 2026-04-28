@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}{{ destination.name }}{% endblock %}
+
+{% block content %}
+<h2>{{ destination.name }}</h2>
+<p><strong>Location:</strong> {{ destination.location }}</p>
+<p>{{ destination.description }}</p>
+{% if destination.image_url %}
+<img src="{{ destination.image_url }}" alt="{{ destination.name }}" class="img-fluid">
+{% endif %}
+
+<h3>Reviews</h3>
+{% for review in destination.reviews %}
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">Rating: {{ review.rating }}/5</h5>
+        <p class="card-text">{{ review.content }}</p>
+        <small class="text-muted">By {{ review.user.username }}</small>
+    </div>
+</div>
+{% endfor %}
+
+{% if current_user.is_authenticated %}
+<h3>Add Review</h3>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+        {{ form.rating.label(class="form-label") }}
+        {{ form.rating(class="form-control") }}
+    </div>
+    <div class="mb-3">
+        {{ form.content.label(class="form-label") }}
+        {{ form.content(class="form-control", rows=3) }}
+    </div>
+    <button type="submit" class="btn btn-primary">Submit Review</button>
+</form>
+{% endif %}
+{% endblock %}
