@@ -1,24 +1,51 @@
 {% extends "base.html" %}
-
-{% block title %}My Travel Plans{% endblock %}
-
+{% block title %}My Trips · Aurelia{% endblock %}
 {% block content %}
-<h2>My Travel Plans</h2>
-<a href="/create_plan" class="btn btn-primary mb-3">Create New Plan</a>
-{% for plan in plans %}
-<div class="card mb-3">
-    <div class="card-header">
-        <h5>{{ plan.name }}</h5>
+<section class="container-luxe" style="padding-top:3rem;">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;margin-bottom:2rem;">
+    <div>
+      <div style="font-size:0.8rem;color:var(--gold);letter-spacing:4px;text-transform:uppercase;">Itineraries</div>
+      <h1 style="margin:0.5rem 0 0;">My Trips</h1>
+      <p class="text-muted">Your curated journeys</p>
     </div>
-    <div class="card-body">
-        <h6>Destinations:</h6>
-        <ul>
-            {% for dest in plan.destinations %}
-            <li>{{ dest.name }} - <a href="/remove_from_plan/{{ plan.id }}/{{ dest.id }}" class="btn btn-sm btn-danger">Remove</a></li>
-            {% endfor %}
-        </ul>
-        <a href="/add_destination_to_plan/{{ plan.id }}" class="btn btn-secondary">Add Destination</a>
+    <a href="{{ url_for('create_plan') }}" class="btn-luxe">+ New Trip</a>
+  </div>
+
+  {% if plans %}
+  <div class="dest-grid">
+    {% for plan in plans %}
+    <div class="glass" style="padding:1.5rem;">
+      <h3 style="font-family:var(--serif);margin:0 0 0.6rem;">{{ plan.name }}</h3>
+      <div class="text-muted" style="font-size:0.85rem;margin-bottom:0.8rem;">
+        {% if plan.start_date %}{{ plan.start_date.strftime('%b %d') }} → {{ plan.end_date.strftime('%b %d, %Y') if plan.end_date else 'TBD' }}{% else %}No dates set{% endif %}
+        {% if plan.duration_days %} · {{ plan.duration_days }} days{% endif %}
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:1rem;font-size:0.9rem;">
+        <span><strong>{{ plan.destinations|length }}</strong> stops</span>
+        {% if plan.budget %}<span>Budget: <strong style="color:var(--gold);">${{ '%.0f'|format(plan.budget) }}</strong></span>{% endif %}
+      </div>
+      {% if plan.destinations %}
+      <div style="margin-bottom:1rem;">
+        {% for dest in plan.destinations[:3] %}
+          <span style="display:inline-block;background:rgba(212,175,55,0.1);border:1px solid var(--border);color:var(--gold);padding:0.2rem 0.7rem;border-radius:999px;font-size:0.78rem;margin:0.15rem;">{{ dest.name }}</span>
+        {% endfor %}
+        {% if plan.destinations|length > 3 %}<span class="text-muted" style="font-size:0.78rem;">+{{ plan.destinations|length - 3 }} more</span>{% endif %}
+      </div>
+      {% endif %}
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <a href="{{ url_for('plan_detail', plan_id=plan.id) }}" class="btn-luxe btn-sm">Open</a>
+        <a href="{{ url_for('add_destination_to_plan', plan_id=plan.id) }}" class="btn-ghost btn-sm">+ Add Stop</a>
+      </div>
     </div>
-</div>
-{% endfor %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <div class="icon">✈</div>
+    <h3>No trips planned yet</h3>
+    <p>Start curating your first journey.</p>
+    <a href="{{ url_for('create_plan') }}" class="btn-luxe" style="margin-top:1rem;">Create First Trip</a>
+  </div>
+  {% endif %}
+</section>
 {% endblock %}

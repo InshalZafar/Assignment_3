@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}World Map · Aurelia{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+{% endblock %}
+{% block content %}
+<section class="container-luxe" style="padding-top:3rem;">
+  <div style="margin-bottom:1.5rem;">
+    <div style="font-size:0.8rem;color:var(--gold);letter-spacing:4px;text-transform:uppercase;">Atlas</div>
+    <h1 id="map-heading" style="margin:0.5rem 0 0;">Explore the World</h1>
+    <p class="text-muted">{{ total }} destinations plotted across the globe</p>
+  </div>
+  <div id="map"></div>
+</section>
+{% endblock %}
+{% block extra_scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const pins = {{ pins | tojson }};
+  const map = L.map('map').setView([20, 10], 2);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '© OpenStreetMap, © CARTO',
+    maxZoom: 19,
+  }).addTo(map);
+
+  const goldIcon = L.divIcon({
+    className: 'aurelia-pin',
+    html: '<div style="width:18px;height:18px;border-radius:50%;background:#d4af37;box-shadow:0 0 12px rgba(212,175,55,0.8);border:2px solid #fff;"></div>',
+    iconSize: [18, 18],
+  });
+
+  pins.forEach((p) => {
+    if (!p.lat && !p.lng) return;
+    const m = L.marker([p.lat, p.lng], { icon: goldIcon }).addTo(map);
+    m.bindPopup(`
+      <div style="min-width:200px;">
+        <img src="${p.image || ''}" style="width:100%;height:100px;object-fit:cover;border-radius:8px;margin-bottom:8px;" onerror="this.style.display='none'">
+        <strong style="font-family:Playfair Display,serif;font-size:1.1rem;">${p.name}</strong><br>
+        <span style="color:#9ba3c4;font-size:0.85rem;">${p.location}${p.country ? ', ' + p.country : ''}</span><br>
+        <span style="color:#d4af37;">★ ${p.rating || '—'}</span> · <span style="font-size:0.8rem;">${p.category}</span><br>
+        <a href="/destination/${p.id}" style="color:#d4af37;font-size:0.85rem;">View details →</a>
+      </div>
+    `);
+  });
+</script>
+{% endblock %}

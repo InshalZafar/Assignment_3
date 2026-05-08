@@ -1,18 +1,22 @@
 {% extends "base.html" %}
-
-{% block title %}Add Destination to Plan{% endblock %}
-
+{% block title %}Add Stop · {{ plan.name }}{% endblock %}
 {% block content %}
-<h2>Add Destination to {{ plan.name }}</h2>
-<form method="POST">
-    <div class="mb-3">
-        <label for="destination_id" class="form-label">Select Destination</label>
-        <select name="destination_id" class="form-control" id="destination_id">
-            {% for dest in destinations %}
-            <option value="{{ dest.id }}">{{ dest.name }}</option>
-            {% endfor %}
+<div class="container-luxe">
+  <div class="form-card" style="max-width:580px;">
+    <h2>Add a Stop</h2>
+    <p class="subtitle">to <strong style="color:var(--gold);">{{ plan.name }}</strong></p>
+    <form method="POST" novalidate>
+      <div class="form-group">
+        <label>Choose a Destination</label>
+        <select name="destination_id" id="destination_id" required>
+          {% for dest in destinations %}
+            <option value="{{ dest.id }}">{{ dest.name }} — {{ dest.location }}</option>
+          {% endfor %}
         </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Add</button>
-</form>
+      </div>
+      <button type="submit" class="btn-luxe" style="width:100%;justify-content:center;">Add to Trip</button>
+    </form>
+    <p style="text-align:center;margin-top:1.5rem;"><a href="{{ url_for('plan_detail', plan_id=plan.id) }}">← Back to trip</a></p>
+  </div>
+</div>
 {% endblock %}

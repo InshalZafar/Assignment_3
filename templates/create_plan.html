@@ -1,15 +1,36 @@
 {% extends "base.html" %}
-
-{% block title %}Create Travel Plan{% endblock %}
-
+{% block title %}{% if edit %}Edit{% else %}New{% endif %} Trip · Aurelia{% endblock %}
 {% block content %}
-<h2>Create Travel Plan</h2>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div class="mb-3">
-        {{ form.name.label(class="form-label") }}
-        {{ form.name(class="form-control") }}
-    </div>
-    <button type="submit" class="btn btn-primary">Create</button>
-</form>
+<div class="container-luxe">
+  <div class="form-card" style="max-width:580px;">
+    <h2>{% if edit %}Refine Your Itinerary{% else %}Begin a Journey{% endif %}</h2>
+    <p class="subtitle">Every great trip starts with a name</p>
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        <label>Trip Name</label>
+        {{ form.name(placeholder="A Mediterranean Summer") }}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="form-group">
+          <label>Start Date</label>
+          {{ form.start_date() }}
+        </div>
+        <div class="form-group">
+          <label>End Date</label>
+          {{ form.end_date() }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Budget (USD)</label>
+        {{ form.budget(placeholder="2500") }}
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        {{ form.notes(placeholder="Anything to remember…") }}
+      </div>
+      <button type="submit" class="btn-luxe" style="width:100%;justify-content:center;">{% if edit %}Save Changes{% else %}Create Trip{% endif %}</button>
+    </form>
+  </div>
+</div>
 {% endblock %}

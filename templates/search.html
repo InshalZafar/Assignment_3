@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Search · Aurelia{% endblock %}
+{% block content %}
+<section class="container-luxe" style="padding-top:3rem;">
+  <div style="margin-bottom:2rem;">
+    <div style="font-size:0.8rem;color:var(--gold);letter-spacing:4px;text-transform:uppercase;">Search</div>
+    <h1 id="search-heading" style="margin:0.5rem 0 0;">{% if q or category %}Results{% else %}Find Your Next Trip{% endif %}</h1>
+  </div>
+
+  <form method="get" action="{{ url_for('search') }}" class="glass glass-pad" style="margin-bottom:2rem;">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:1rem;align-items:end;">
+      <div class="form-group" style="margin:0;">
+        <label>Keyword</label>
+        <input type="text" name="q" value="{{ q }}" placeholder="Beach, mountain, city…">
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label>Category</label>
+        <select name="category">
+          <option value="">All</option>
+          {% for c in CATEGORIES %}
+            <option value="{{ c }}" {% if category == c %}selected{% endif %}>{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label>Min Rating</label>
+        <select name="min_rating">
+          {% for v in [0, 1, 2, 3, 4, 5] %}
+            <option value="{{ v }}" {% if min_rating == v %}selected{% endif %}>{{ v if v else 'Any' }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn-luxe">Search</button>
+    </div>
+  </form>
+
+  {% if results %}
+    <p class="text-muted">{{ results|length }} match{{ 'es' if results|length != 1 else '' }} found</p>
+    <div class="dest-grid">
+      {% for d in results %}
+        {% include '_card.html' %}
+      {% endfor %}
+    </div>
+  {% elif q or category or min_rating %}
+    <div class="empty">
+      <div class="icon">⌕</div>
+      <h3>No matches</h3>
+      <p>Try a different keyword or filter.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

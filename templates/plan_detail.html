@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}{{ plan.name }} · Aurelia{% endblock %}
+{% block content %}
+<section class="container-luxe" style="padding-top:3rem;">
+  <div style="margin-bottom:1rem;"><a href="{{ url_for('travel_plans') }}" class="text-muted">← All trips</a></div>
+
+  <div class="glass glass-pad" style="margin-bottom:2rem;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <div style="font-size:0.78rem;color:var(--gold);letter-spacing:3px;text-transform:uppercase;">Itinerary</div>
+        <h1 id="plan-title" style="margin:0.4rem 0 0.5rem;">{{ plan.name }}</h1>
+        <div class="text-muted">
+          {% if plan.start_date %}{{ plan.start_date.strftime('%B %d, %Y') }}{% endif %}
+          {% if plan.end_date %} — {{ plan.end_date.strftime('%B %d, %Y') }}{% endif %}
+          {% if plan.duration_days %} · {{ plan.duration_days }} days{% endif %}
+        </div>
+      </div>
+      <div style="display:flex;gap:0.5rem;">
+        <a href="{{ url_for('edit_plan', plan_id=plan.id) }}" class="btn-ghost btn-sm">Edit</a>
+        <a href="{{ url_for('add_destination_to_plan', plan_id=plan.id) }}" class="btn-luxe btn-sm">+ Add Stop</a>
+        <form action="{{ url_for('delete_plan', plan_id=plan.id) }}" method="POST" style="display:inline;">
+          <button type="submit" class="btn-danger" onclick="return confirm('Delete this plan?')">Delete</button>
+        </form>
+      </div>
+    </div>
+    {% if plan.notes %}<p style="margin-top:1rem;color:var(--text);">{{ plan.notes }}</p>{% endif %}
+  </div>
+
+  <div class="budget-bar" id="budget-bar">
+    <div>
+      <div style="font-size:0.78rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase;">Trip Budget</div>
+      <div class="text-muted" style="font-size:0.9rem;">
+        {{ plan.destinations|length }} stop{{ '' if plan.destinations|length == 1 else 's' }}
+        {% if plan.duration_days %}· {{ plan.duration_days }} days{% endif %}
+      </div>
+    </div>
+    <div style="text-align:right;">
+      <div class="total" id="budget-total">${{ '%.0f'|format(plan.budget or 0) }}</div>
+      {% if plan.duration_days and plan.budget %}
+      <div class="text-muted" style="font-size:0.85rem;">≈ ${{ '%.0f'|format((plan.budget or 0) / plan.duration_days) }} / day</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <h2 style="font-family:var(--serif);margin-top:2rem;">The Itinerary</h2>
+  {% if plan.destinations %}
+    <div class="dest-grid">
+      {% for d in plan.destinations %}
+        <div class="glass" style="padding:0;overflow:hidden;">
+          <div class="card-img" style="height:160px;background:url('{{ d.image_url }}') center/cover; position:relative;">
+            <div class="badge-cat">{{ d.category }}</div>
+          </div>
+          <div style="padding:1rem;">
+            <h3 style="margin:0 0 0.3rem;font-family:var(--serif);font-size:1.2rem;">{{ d.name }}</h3>
+            <div class="text-muted" style="font-size:0.85rem;margin-bottom:0.8rem;">📍 {{ d.location }}</div>
+            <div style="display:flex;gap:0.4rem;">
+              <a href="{{ url_for('destination_detail', id=d.id) }}" class="btn-ghost btn-sm">View</a>
+              <a href="{{ url_for('remove_from_plan', plan_id=plan.id, dest_id=d.id) }}" class="btn-danger" onclick="return confirm('Remove from trip?')">Remove</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty">
+      <div class="icon">📍</div>
+      <p>No stops added yet.</p>
+      <a href="{{ url_for('add_destination_to_plan', plan_id=plan.id) }}" class="btn-luxe" style="margin-top:1rem;">Add Your First Stop</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

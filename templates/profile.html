@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{{ user.username }} · Aurelia{% endblock %}
+{% block content %}
+<section class="container-luxe" style="padding-top:3rem;">
+  <div class="glass profile-hero">
+    <div class="avatar-circle" style="background:{{ user.avatar_color }};">{{ user.initials }}</div>
+    <div class="info" style="flex:1;">
+      <h2 id="profile-username">{{ user.username }}</h2>
+      <div class="joined">Member since {{ user.created_at.strftime('%B %Y') if user.created_at else '—' }}</div>
+      <p class="text-muted" style="max-width:560px;">{{ user.bio or 'No bio yet.' }}</p>
+      <div class="stats">
+        <div class="stat">
+          <div class="n" data-count="{{ stats.reviews }}">0</div>
+          <div class="l">Reviews</div>
+        </div>
+        <div class="stat">
+          <div class="n" data-count="{{ stats.plans }}">0</div>
+          <div class="l">Trips</div>
+        </div>
+        <div class="stat">
+          <div class="n" data-count="{{ stats.wishlist }}">0</div>
+          <div class="l">Wishlist</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if form %}
+  <div class="glass glass-pad" style="margin-top:2rem;">
+    <h3 style="font-family:var(--serif);margin-top:0;">Edit Your Profile</h3>
+    <form method="POST">
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        <label>Bio</label>
+        {{ form.bio(placeholder="A few words about your travels…") }}
+      </div>
+      <div class="form-group">
+        <label>Avatar Color (hex)</label>
+        {{ form.avatar_color(type="color") }}
+      </div>
+      <button type="submit" class="btn-luxe">Save</button>
+    </form>
+  </div>
+  {% endif %}
+
+  {% if user.reviews %}
+  <section style="margin-top:3rem;">
+    <div class="section-title"><span class="eyebrow">Recent Reviews</span></div>
+    {% for review in user.reviews|reverse %}
+      <div class="review">
+        <div class="review-head">
+          <div><strong>{{ review.destination.name }}</strong> <span class="text-muted">— {{ review.destination.location }}</span></div>
+          <span class="rating-display">{% for i in range(review.rating) %}★{% endfor %}</span>
+        </div>
+        <p class="review-content">{{ review.content }}</p>
+        <a href="{{ url_for('destination_detail', id=review.destination_id) }}" style="font-size:0.85rem;">View destination →</a>
+      </div>
+    {% endfor %}
+  </section>
+  {% endif %}
+</section>
+{% endblock %}

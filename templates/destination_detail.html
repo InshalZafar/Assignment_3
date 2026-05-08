@@ -1,39 +1,146 @@
 {% extends "base.html" %}
-
-{% block title %}{{ destination.name }}{% endblock %}
-
+{% block title %}{{ destination.name }} · Aurelia{% endblock %}
 {% block content %}
-<h2>{{ destination.name }}</h2>
-<p><strong>Location:</strong> {{ destination.location }}</p>
-<p>{{ destination.description }}</p>
-{% if destination.image_url %}
-<img src="{{ destination.image_url }}" alt="{{ destination.name }}" class="img-fluid">
-{% endif %}
+<section class="container-luxe" style="padding-top:2rem;">
+  <div class="detail-hero" style="background-image:url('{{ destination.image_url or 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600' }}');">
+    <div class="info">
+      <div class="badge-cat" style="position:relative;display:inline-block;margin-bottom:1rem;">{{ destination.category }}</div>
+      <h1>{{ destination.name }}</h1>
+      <div class="meta">
+        <span>📍 {{ destination.location }}{% if destination.country %}, {{ destination.country }}{% endif %}</span>
+        <span class="rating-display">★ {{ destination.avg_rating or '—' }} ({{ destination.review_count }} reviews)</span>
+      </div>
+    </div>
+  </div>
 
-<h3>Reviews</h3>
-{% for review in destination.reviews %}
-<div class="card mb-3">
-    <div class="card-body">
-        <h5 class="card-title">Rating: {{ review.rating }}/5</h5>
-        <p class="card-text">{{ review.content }}</p>
-        <small class="text-muted">By {{ review.user.username }}</small>
-    </div>
-</div>
-{% endfor %}
+  <div class="detail-grid">
+    <div>
+      <div class="glass glass-pad" style="margin-bottom:2rem;">
+        <h2 style="margin-top:0;">About this place</h2>
+        <p style="line-height:1.7;color:var(--text);">{{ destination.description }}</p>
 
-{% if current_user.is_authenticated %}
-<h3>Add Review</h3>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div class="mb-3">
-        {{ form.rating.label(class="form-label") }}
-        {{ form.rating(class="form-control") }}
+        {% if destination.images %}
+        <h3 style="font-family:var(--serif);margin-top:2rem;">Gallery</h3>
+        <div class="gallery">
+          {% for img in destination.images %}
+            <img src="{{ img.url }}" data-full="{{ img.url }}" alt="{{ destination.name }}">
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if current_user.is_authenticated %}
+        <div style="display:flex;gap:0.5rem;margin-top:1.5rem;flex-wrap:wrap;">
+          <a href="{{ url_for('edit_destination', id=destination.id) }}" class="btn-ghost btn-sm">Edit</a>
+          <form action="{{ url_for('delete_destination', id=destination.id) }}" method="POST" style="display:inline;">
+            <button type="submit" class="btn-danger" onclick="return confirm('Delete this destination?')">Delete</button>
+          </form>
+          <form action="{{ url_for('wishlist_toggle', dest_id=destination.id) }}" method="POST" style="display:inline;">
+            <button type="submit" class="btn-ghost btn-sm">
+              {% if destination.id in wishlist_ids %}♥ In Wishlist{% else %}♡ Save{% endif %}
+            </button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="glass glass-pad">
+        <h2 style="margin-top:0;">Reviews <span class="text-muted" style="font-size:1rem;font-weight:400;">({{ destination.reviews|length }})</span></h2>
+
+        {% if destination.reviews %}
+          {% for review in destination.reviews|reverse %}
+          <div class="review">
+            <div class="review-head">
+              <div class="review-author">
+                <div class="avatar-sm" style="background:{{ review.user.avatar_color or '#d4af37' }};">{{ review.user.initials }}</div>
+                <div>
+                  <div><strong>{{ review.user.username }}</strong></div>
+                  <div class="review-meta">{{ review.created_at.strftime('%b %d, %Y') if review.created_at else '' }}</div>
+                </div>
+              </div>
+              <span class="rating-display">{% for i in range(review.rating) %}★{% endfor %}</span>
+            </div>
+            <p class="review-content">{{ review.content }}</p>
+            {% if review.replies %}
+            <div class="replies">
+              {% for r in review.replies %}
+              <div class="reply-item">
+                <strong>{{ r.user.username }}</strong>
+                <span class="text-muted" style="font-size:0.8rem;"> · {{ r.created_at.strftime('%b %d') if r.created_at else '' }}</span>
+                <div>{{ r.content }}</div>
+              </div>
+              {% endfor %}
+            </div>
+            {% endif %}
+            {% if current_user.is_authenticated %}
+            <details style="margin-top:0.7rem;">
+              <summary style="cursor:pointer;color:var(--gold);font-size:0.85rem;">Reply</summary>
+              <form action="{{ url_for('reply_to_review', id=review.id) }}" method="POST" style="margin-top:0.6rem;">
+                {{ reply_form.hidden_tag() }}
+                <div class="form-group" style="margin-bottom:0.6rem;">
+                  <textarea name="content" placeholder="Your reply..." required style="min-height:60px;width:100%;padding:0.6rem;background:rgba(5,8,22,0.5);color:var(--text);border:1px solid var(--border);border-radius:8px;"></textarea>
+                </div>
+                <button type="submit" class="btn-ghost btn-sm">Post Reply</button>
+              </form>
+            </details>
+            {% endif %}
+          </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-muted">No reviews yet. Be the first.</p>
+        {% endif %}
+
+        {% if current_user.is_authenticated %}
+        <hr style="border-color:var(--border);margin:2rem 0;">
+        <h3 style="font-family:var(--serif);">Share your experience</h3>
+        <form method="POST" id="review-form">
+          {{ form.hidden_tag() }}
+          <div class="form-group">
+            <label>Rating</label>
+            <div class="star-rating" data-input="rating">
+              <span class="star">★</span>
+              <span class="star">★</span>
+              <span class="star">★</span>
+              <span class="star">★</span>
+              <span class="star">★</span>
+            </div>
+            {{ form.rating(type="hidden", value="5") }}
+          </div>
+          <div class="form-group">
+            <label>Your Review</label>
+            {{ form.content(placeholder="Tell other travelers what made this place special...") }}
+          </div>
+          <button type="submit" class="btn-luxe">Post Review</button>
+        </form>
+        {% else %}
+        <p class="text-muted" style="margin-top:1.5rem;"><a href="{{ url_for('login') }}">Sign in</a> to leave a review.</p>
+        {% endif %}
+      </div>
     </div>
-    <div class="mb-3">
-        {{ form.content.label(class="form-label") }}
-        {{ form.content(class="form-control", rows=3) }}
-    </div>
-    <button type="submit" class="btn btn-primary">Submit Review</button>
-</form>
-{% endif %}
+
+    <aside>
+      <div class="weather-card" data-weather data-lat="{{ destination.latitude }}" data-lng="{{ destination.longitude }}">
+        <div style="font-size:0.78rem;color:var(--gold);letter-spacing:2px;text-transform:uppercase;">Right Now</div>
+        <div class="temp">—</div>
+        <div class="cond">Loading weather…</div>
+      </div>
+
+      {% if destination.latitude or destination.longitude %}
+      <div class="glass glass-pad" style="margin-top:1.5rem;">
+        <h3 style="margin-top:0;font-family:var(--serif);">Coordinates</h3>
+        <p class="text-muted" style="margin:0;">{{ destination.latitude }}°, {{ destination.longitude }}°</p>
+        <a href="{{ url_for('world_map') }}#dest-{{ destination.id }}" class="btn-ghost btn-sm" style="margin-top:1rem;">View on Map</a>
+      </div>
+      {% endif %}
+
+      {% if current_user.is_authenticated and current_user.travel_plans %}
+      <div class="glass glass-pad" style="margin-top:1.5rem;">
+        <h3 style="margin-top:0;font-family:var(--serif);">Add to a Trip</h3>
+        {% for plan in current_user.travel_plans %}
+          <a href="{{ url_for('add_destination_to_plan', plan_id=plan.id) }}" class="btn-ghost btn-sm" style="margin:0.2rem 0;display:block;text-align:center;">{{ plan.name }}</a>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </aside>
+  </div>
+</section>
 {% endblock %}

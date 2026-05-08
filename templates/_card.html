@@ -1,0 +1,21 @@
+<article class="dest-card fade-up" data-testid="dest-card">
+  <a href="{{ url_for('destination_detail', id=d.id) }}" style="color:inherit;">
+    <div class="card-img" style="background-image:url('{{ d.image_url or 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800' }}');">
+      <div class="badge-cat">{{ d.category }}</div>
+      {% if current_user.is_authenticated %}
+      <button class="heart-btn {% if d.id in wishlist_ids %}active{% endif %}" data-dest="{{ d.id }}" aria-label="Wishlist">
+        {% if d.id in wishlist_ids %}♥{% else %}♡{% endif %}
+      </button>
+      {% endif %}
+    </div>
+    <div class="card-body">
+      <h3>{{ d.name }}</h3>
+      <div class="loc">📍 {{ d.location }}{% if d.country %}, {{ d.country }}{% endif %}</div>
+      <div class="desc">{{ d.description }}</div>
+      <div class="card-footer">
+        <span class="rating-display">★ {{ d.avg_rating or '—' }} <span class="text-muted" style="font-weight:400;font-size:0.8rem;">({{ d.review_count }})</span></span>
+        <span class="text-muted" style="font-size:0.85rem;">View →</span>
+      </div>
+    </div>
+  </a>
+</article>

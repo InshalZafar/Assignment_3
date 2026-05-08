@@ -1,27 +1,50 @@
 {% extends "base.html" %}
-
-{% block title %}{% if destination %}Edit{% else %}Add{% endif %} Destination{% endblock %}
-
+{% block title %}{% if destination %}Edit{% else %}Add{% endif %} Destination · Aurelia{% endblock %}
 {% block content %}
-<h2>{% if destination %}Edit{% else %}Add{% endif %} Destination</h2>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div class="mb-3">
-        {{ form.name.label(class="form-label") }}
-        {{ form.name(class="form-control") }}
-    </div>
-    <div class="mb-3">
-        {{ form.location.label(class="form-label") }}
-        {{ form.location(class="form-control") }}
-    </div>
-    <div class="mb-3">
-        {{ form.description.label(class="form-label") }}
-        {{ form.description(class="form-control", rows=4) }}
-    </div>
-    <div class="mb-3">
-        {{ form.image_url.label(class="form-label") }}
-        {{ form.image_url(class="form-control") }}
-    </div>
-    <button type="submit" class="btn btn-primary">Save</button>
-</form>
+<div class="container-luxe">
+  <div class="form-card" style="max-width:680px;">
+    <h2>{% if destination %}Refine{% else %}Curate{% endif %} a Destination</h2>
+    <p class="subtitle">{% if destination %}Update the details below{% else %}Add a new place to the catalogue{% endif %}</p>
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        <label>Name</label>
+        {{ form.name(placeholder="Santorini, Banff, Kyoto…") }}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="form-group">
+          <label>City / Location</label>
+          {{ form.location(placeholder="Oia") }}
+        </div>
+        <div class="form-group">
+          <label>Country</label>
+          {{ form.country(placeholder="Greece") }}
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        {{ form.category() }}
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        {{ form.description(placeholder="What makes this place unforgettable?") }}
+      </div>
+      <div class="form-group">
+        <label>Cover Image URL</label>
+        {{ form.image_url(placeholder="https://…") }}
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div class="form-group">
+          <label>Latitude</label>
+          {{ form.latitude(placeholder="36.4618") }}
+        </div>
+        <div class="form-group">
+          <label>Longitude</label>
+          {{ form.longitude(placeholder="25.3753") }}
+        </div>
+      </div>
+      <button type="submit" class="btn-luxe" style="width:100%;justify-content:center;">{% if destination %}Save Changes{% else %}Add to Catalogue{% endif %}</button>
+    </form>
+  </div>
+</div>
 {% endblock %}

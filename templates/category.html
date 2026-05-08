@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}{{ category_name }} · Aurelia{% endblock %}
+{% block content %}
+<section class="container-luxe" style="padding-top:3rem;">
+  <div style="margin-bottom:2rem;">
+    <div style="font-size:0.8rem;color:var(--gold);letter-spacing:4px;text-transform:uppercase;">Category</div>
+    <h1 id="category-heading" style="margin:0.5rem 0 0;">{{ category_name }} Escapes</h1>
+    <p class="text-muted">{{ destinations|length }} curated {{ category_name|lower }} destination{{ '' if destinations|length == 1 else 's' }}</p>
+  </div>
+
+  <div class="cat-pills">
+    <a href="{{ url_for('destinations') }}" class="cat-pill">All</a>
+    {% for c in CATEGORIES %}
+      <a href="{{ url_for('category', name=c) }}" class="cat-pill {% if c == category_name %}active{% endif %}">{{ c }}</a>
+    {% endfor %}
+  </div>
+
+  {% if destinations %}
+  <div class="dest-grid">
+    {% for d in destinations %}
+      {% include '_card.html' %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty">
+    <div class="icon">🌐</div>
+    <p>No {{ category_name|lower }} destinations yet.</p>
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · Aurelia{% endblock %}
+{% block content %}
+<section class="container-luxe" style="padding-top:3rem;">
+  <div style="margin-bottom:2rem;">
+    <div style="font-size:0.8rem;color:var(--gold);letter-spacing:4px;text-transform:uppercase;">Insights</div>
+    <h1 id="dashboard-heading" style="margin:0.5rem 0 0;">Aurelia Dashboard</h1>
+    <p class="text-muted">A pulse on the curated world</p>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card"><div class="num" data-count="{{ stats.destinations }}">0</div><div class="label">Destinations</div></div>
+    <div class="stat-card"><div class="num" data-count="{{ stats.reviews }}">0</div><div class="label">Reviews</div></div>
+    <div class="stat-card"><div class="num" data-count="{{ stats.travelers }}">0</div><div class="label">Members</div></div>
+    <div class="stat-card"><div class="num" data-count="{{ stats.plans }}">0</div><div class="label">Trips</div></div>
+    <div class="stat-card"><div class="num" data-count="{{ stats.replies }}">0</div><div class="label">Replies</div></div>
+    <div class="stat-card"><div class="num" data-count="{{ stats.wishlists }}">0</div><div class="label">Saves</div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:3rem;">
+    <div class="glass glass-pad">
+      <h3 style="font-family:var(--serif);margin-top:0;">★ Top Rated</h3>
+      {% if top_rated %}
+        {% for d in top_rated %}
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:0.8rem 0;border-bottom:1px solid var(--border);">
+          <div>
+            <a href="{{ url_for('destination_detail', id=d.id) }}"><strong>{{ d.name }}</strong></a>
+            <div class="text-muted" style="font-size:0.85rem;">{{ d.location }}</div>
+          </div>
+          <span class="rating-display">★ {{ d.avg_rating }}</span>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p class="text-muted">No reviews yet.</p>
+      {% endif %}
+    </div>
+
+    <div class="glass glass-pad">
+      <h3 style="font-family:var(--serif);margin-top:0;">🔥 Most Reviewed</h3>
+      {% for d in most_reviewed %}
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:0.8rem 0;border-bottom:1px solid var(--border);">
+        <div>
+          <a href="{{ url_for('destination_detail', id=d.id) }}"><strong>{{ d.name }}</strong></a>
+          <div class="text-muted" style="font-size:0.85rem;">{{ d.location }}</div>
+        </div>
+        <span class="text-muted">{{ d.review_count }} reviews</span>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="glass glass-pad">
+      <h3 style="font-family:var(--serif);margin-top:0;">By Category</h3>
+      {% for cat, count in category_counts.items() %}
+      <div style="margin-bottom:1rem;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:0.4rem;font-size:0.9rem;">
+          <span>{{ cat }}</span>
+          <span class="text-muted">{{ count }}</span>
+        </div>
+        <div style="height:6px;background:rgba(212,175,55,0.1);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-soft));width:{{ (count / (stats.destinations or 1) * 100)|round(0)|int }}%;"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="glass glass-pad">
+      <h3 style="font-family:var(--serif);margin-top:0;">🏆 Top Reviewers</h3>
+      {% for u, rc in top_users %}
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:0.7rem 0;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:0.7rem;">
+          <div class="avatar-sm" style="background:{{ u.avatar_color or '#d4af37' }};">{{ u.initials }}</div>
+          <a href="{{ url_for('profile', username=u.username) }}"><strong>{{ u.username }}</strong></a>
+        </div>
+        <span class="text-muted">{{ rc }} review{{ '' if rc == 1 else 's' }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

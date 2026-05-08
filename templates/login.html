@@ -1,19 +1,27 @@
 {% extends "base.html" %}
-
-{% block title %}Login{% endblock %}
-
+{% block title %}Sign In · Aurelia{% endblock %}
 {% block content %}
-<h2>Login</h2>
-<form method="POST">
-    {{ form.hidden_tag() }}
-    <div class="mb-3">
-        {{ form.email.label(class="form-label") }}
-        {{ form.email(class="form-control") }}
-    </div>
-    <div class="mb-3">
-        {{ form.password.label(class="form-label") }}
-        {{ form.password(class="form-control") }}
-    </div>
-    <button type="submit" class="btn btn-primary">Login</button>
-</form>
+<div class="container-luxe">
+  <div class="form-card">
+    <h2>Welcome Back</h2>
+    <p class="subtitle">Sign in to your Aurelia account</p>
+    <form method="POST" novalidate>
+      {{ form.hidden_tag() }}
+      <div class="form-group">
+        <label>Email</label>
+        {{ form.email(placeholder="you@example.com") }}
+        {% if form.email.errors %}<div class="errors">{{ form.email.errors[0] }}</div>{% endif %}
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        {{ form.password(placeholder="••••••••") }}
+        {% if form.password.errors %}<div class="errors">{{ form.password.errors[0] }}</div>{% endif %}
+      </div>
+      <button type="submit" class="btn-luxe" style="width:100%;justify-content:center;">Sign In</button>
+    </form>
+    <p style="text-align:center;margin-top:1.5rem;color:var(--text-muted);font-size:0.9rem;">
+      New here? <a href="{{ url_for('register') }}">Create an account</a>
+    </p>
+  </div>
+</div>
 {% endblock %}
