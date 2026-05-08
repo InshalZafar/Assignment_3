@@ -129,11 +129,11 @@ pipeline {
                     chmod 777 test-results
                     docker run --rm --network $NETWORK \
                         -e BASE_URL=http://aurelia-app:5000 \
-                        -v $WORKSPACE/test-results:/tests \
+                        -v $WORKSPACE/test-results:/results \
                         $TEST_IMAGE \
                         pytest -v tests/ \
-                            --junitxml=/tests/results.xml \
-                            --html=/tests/report.html \
+                            --junitxml=/results/results.xml \
+                            --html=/results/report.html \
                             --self-contained-html
                 '''
             }
