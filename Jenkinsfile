@@ -66,12 +66,15 @@ pipeline {
                         mysql:8.0
 
                     echo "Waiting for MySQL to accept connections..."
-                    for i in $(seq 1 40); do
+                    for i in $(seq 1 60); do
                         docker exec aurelia-db mysqladmin -uroot -prootpassword ping --silent 2>/dev/null && break
                         sleep 2
                     done
+                    # Even after ping succeeds the user/db init isn't always finished
+                    sleep 5
 
                     docker run -d --name aurelia-app --network $NETWORK \
+                        --restart on-failure:5 \
                         -p $APP_PORT:5000 \
                         -e DB_HOST=aurelia-db \
                         -e DB_USER=root \
@@ -80,10 +83,19 @@ pipeline {
                         $APP_IMAGE
 
                     echo "Waiting for Aurelia to come up..."
-                    for i in $(seq 1 40); do
-                        docker exec aurelia-app curl -sf http://localhost:5000/ >/dev/null 2>&1 && break
+                    for i in $(seq 1 60); do
+                        if docker inspect -f '{{.State.Running}}' aurelia-app 2>/dev/null | grep -q true; then
+                            if docker exec aurelia-app curl -sf http://localhost:5000/ >/dev/null 2>&1; then
+                                break
+                            fi
+                        fi
                         sleep 2
                     done
+
+                    echo "App container status:"
+                    docker ps --filter name=aurelia-app
+                    echo "App container last logs:"
+                    docker logs --tail 30 aurelia-app || true
 
                     echo "Seeding database..."
                     docker exec aurelia-app python populate_db.py

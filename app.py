@@ -415,6 +415,22 @@ app = create_app()
 
 
 if __name__ == '__main__':
+    import sys
+    import time as _time
+    from sqlalchemy.exc import OperationalError
+
     with app.app_context():
-        db.create_all()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+        for attempt in range(1, 31):
+            try:
+                db.create_all()
+                print(f"✓ Database ready (attempt {attempt})")
+                break
+            except OperationalError as exc:
+                print(f"DB not ready, retry {attempt}/30: {exc}")
+                _time.sleep(2)
+        else:
+            print("Failed to connect to database after 30 attempts")
+            sys.exit(1)
+
+    debug_mode = os.environ.get('FLASK_DEBUG', '0') == '1'
+    app.run(host='0.0.0.0', port=5000, debug=debug_mode)
