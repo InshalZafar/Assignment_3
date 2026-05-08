@@ -75,8 +75,7 @@ Assignment_3/
 │   ├── map.html              # Leaflet world map
 │   ├── dashboard.html        # Insights + leaderboards
 │   └── 404.html
-└── tests/
-    └── test_app.py           # 40 Selenium tests
+└── (tests live in InshalZafar/Assignment_3_tests)
 ```
 
 ---
@@ -124,17 +123,23 @@ docker-compose up --build
 
 ### 3. Run the Selenium suite
 
-In one terminal: `python app.py`
-In another:
+The Selenium tests live in a **separate repository**:
+👉 [`InshalZafar/Assignment_3_tests`](https://github.com/InshalZafar/Assignment_3_tests)
+
+40 headless-Chrome cases. Run locally:
 
 ```bash
-pip install selenium pytest
-pytest -v tests/test_app.py
+git clone https://github.com/InshalZafar/Assignment_3_tests.git
+cd Assignment_3_tests
+pip install -r requirements.txt
+
+# Aurelia must be running in another terminal on :5000
+BASE_URL=http://127.0.0.1:5000 pytest -v tests/
 ```
 
-The suite has **40 tests** (15 original + 25 new) and runs against a live
-server at `http://127.0.0.1:5000` using **headless Chrome**. Make sure
-`chromedriver` is on your PATH (or use the Docker image, which bundles it).
+In CI, the same suite runs containerized — see `Jenkinsfile` for the
+Jenkins pipeline that builds the test image, runs it on a shared docker
+network against the deployed app, and emails the result to the pusher.
 
 ---
 
@@ -200,25 +205,19 @@ If neither `DATABASE_URL` nor `DB_HOST` is set, the app falls back to
 
 ## Selenium suite
 
-`tests/test_app.py` contains 40 cases covering:
+Tests live in a dedicated repo:
+**[`InshalZafar/Assignment_3_tests`](https://github.com/InshalZafar/Assignment_3_tests)**
 
-- Auth: register, login (valid + invalid), logout, session persistence
-- Navigation: home, links present, multi-page, refresh, brand link
-- Catalogue: destinations grid, cards render, category pills
-- Search: form filters, keyword query, results render
-- Map: page loads, `#map` element present
-- Dashboard: stats counters, leaderboard sections
-- Profile: page loads, stats counters
-- Wishlist: redirects when logged out, loads when logged in
-- Plans: form has date + budget fields
-- Theme toggle, footer brand, custom 404 page
-- Full register → login → wishlist flow
+40 cases covering auth, navigation, catalogue, search, map, dashboard,
+profile, wishlist, plans, theme toggle, and the full register→login→wishlist
+flow. All headless-Chrome.
 
-All pages expose stable IDs (`#map`, `#dashboard-heading`, `#profile-username`,
-`#wishlist-heading`, `#search-heading`, `#category-heading`, `#plan-title`)
-plus class hooks (`.brand`, `.dest-card`, `.theme-toggle`, `.luxe-footer`,
-`.cat-pill`, `.star-rating`, `[data-weather]`, `[data-count]`) so tests stay
-resilient to copy changes.
+All Aurelia pages expose stable IDs (`#map`, `#dashboard-heading`,
+`#profile-username`, `#wishlist-heading`, `#search-heading`,
+`#category-heading`, `#plan-title`) plus class hooks (`.brand`,
+`.dest-card`, `.theme-toggle`, `.luxe-footer`, `.cat-pill`, `.star-rating`,
+`[data-weather]`, `[data-count]`) so the test suite stays resilient to
+copy/style changes.
 
 ---
 
